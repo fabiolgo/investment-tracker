@@ -1,6 +1,6 @@
 import yfinance as yf
 
-def fetch_price(str(ticker)):
+def fetch_price(ticker):
     try:
         stock = yf.Ticker()
         return stock.history(period="1d")['Close'][-1]  # Latest closing price
