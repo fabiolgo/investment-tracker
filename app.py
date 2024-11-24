@@ -7,19 +7,19 @@ def add_investment_with_check():
     """
     Adds an investment after validating and correcting the ticker symbol.
     """
-    ticker = input("Enter ticker symbol: ")
+    ticker = input("Enter ticker symbol: ").strip().upper()
     quantity = float(input("Enter quantity: "))
     purchase_price = float(input("Enter purchase price: "))
-    purchase_date = input("Enter purchase date (YYYY-MM-DD): ")
+    purchase_date = input("Enter purchase date (DD-MM-YYYY): ").strip()
 
     # Validate ticker
     price, valid_ticker = fetch_price(ticker)
     if not valid_ticker:
         print(f"Could not find ticker {ticker}. Please try again.")
         return
-    
+
     add_investment(valid_ticker, quantity, purchase_price, purchase_date)
-    print(f"Investment added for ticker: {valid_ticker}")
+    print(f"Investment added/updated for ticker: {valid_ticker}")
 
 def main():
     """
@@ -37,15 +37,17 @@ def main():
         print("5. Delete Investment")
         print("6. Exit")
 
-        choice = input("Enter your choice: ")
+        choice = input("Enter your choice: ").strip()
         
         if choice == "1":
             add_investment_with_check()
         
         elif choice == "2":
             portfolio = get_portfolio()
+            print("\nPortfolio:")
             for row in portfolio:
-                print(row)
+                ticker, quantity, avg_price, purchase_dates = row
+                print(f"Ticker: {ticker}, Quantity: {quantity}, Avg. Purchase Price: {avg_price:.2f}, Purchase Dates: {purchase_dates}")
         
         elif choice == "3":
             value = calculate_portfolio_value()
@@ -56,7 +58,7 @@ def main():
             generate_report("portfolio_report.pdf", portfolio)
         
         elif choice == "5":
-            ticker = input("Enter the ticker symbol to delete: ")
+            ticker = input("Enter the ticker symbol to delete: ").strip().upper()
             delete_investment(ticker)
         
         elif choice == "6":

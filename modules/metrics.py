@@ -1,21 +1,23 @@
+import sqlite3
 from modules.api import fetch_price
-from modules.portfolio import get_portfolio
+from modules.portfolio import DB_PATH
 
 def calculate_portfolio_value():
     """
-    Calculates the total current value of the portfolio.
+    Calculates the total value of all investments in the portfolio.
     """
-    portfolio = get_portfolio()
-    total_value = 0
+    total_value = 0.0
 
-    for investment in portfolio:
-        ticker, quantity, purchase_price, _ = investment[1:]  # Skip `id`
-        current_price, valid_ticker = fetch_price(ticker)
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
 
-        if current_price:
-            total_value += current_price * quantity
-            print(f"{valid_ticker}: {quantity} units @ ${current_price:.2f} each")
-        else:
-            print(f"Could not fetch current price for {ticker}.")
-    
+        # Ensure the query selects all the necessary columns
+        cursor.execute('SELECT ticker, quantity, average_purchase_price FROM investments')
+        investments = cursor.fetchall()
+
+        for investment in investments:
+            ticker, quantity, average_purchase_price = investment
+            price, _ = fetch_price(ticker)  # Assuming fetch_price returns (price, valid_ticker)
+            total_value += price * quantity
+
     return total_value
